@@ -1,8 +1,8 @@
 ---
 title: "Prediction Model on the Quality of Execution of Bodybuilding Movements"
-output: html_document
-theme: spacelab
-highlight: neon
+output: 
+  html_document: 
+    keep_md: yes
 ---
 
 ## Executive Summary
@@ -48,7 +48,7 @@ testing <- data[-inTrain,]
 ## Random Forest Prediction Model
 We then train the machine on the training data set with a random forest algorithm. Indeed, it appears to be one of most accurate algorithms to date, even if it is more computationally demanding.
 
-In order to increase computation speed, we parallelise the computation accross four processors. We also pre-process the data via principal component analysis and retain only the first five components. We use an out-of-bag resampling method and decrease the number of trees to 100 (default 500) to increase again computational speed. We have checked that these simplifications were not impacting (at all) the accuracy. The model is generated in about a minute on 2 GHz intel cores (i3).
+In order to increase computation speed, we parallelise the computation accross four processors. We also pre-process the data via principal component analysis and retain only the first five components. We use an **out-of-bag (OOB) resampling method for cross-validation** and decrease the number of trees to 100 (default 500) to increase again computational speed. We have checked that these simplifications were not impacting (at all) the accuracy. The model is generated in about a minute on 2 GHz intel cores (i3).
 ```{r, cache = TRUE}
 cluster <- makeCluster(4)
 registerDoParallel(cluster)
@@ -71,7 +71,12 @@ kable(cfmat$table,
       caption = "Confusion matrix on the testing data set with our trained model.")
 cfmat$overall[1]
 ```
-We thus have 99% accuracy, with sensitivity and specificity of the same order of magnitude. The out of sample OOB error rate is around 1%. Our prediction for the validation data set are then
+We thus have 99% accuracy, with sensitivity and specificity of the same order of magnitude. The out of sample OOB **error rate** is thus
+```{r}
+1 - cfmat$overall[[1]]
+```
+
+Our prediction for the validation data set are then
 ```{r}
 predict(mdl, valid)
 ```

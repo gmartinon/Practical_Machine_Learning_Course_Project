@@ -155,7 +155,7 @@ testing &lt;- data[-inTrain,]</code></pre>
 <div id="random-forest-prediction-model" class="section level2">
 <h2>Random Forest Prediction Model</h2>
 <p>We then train the machine on the training data set with a random forest algorithm. Indeed, it appears to be one of most accurate algorithms to date, even if it is more computationally demanding.</p>
-<p>In order to increase computation speed, we parallelise the computation accross four processors. We also pre-process the data via principal component analysis and retain only the first five components. We use an out-of-bag resampling method and decrease the number of trees to 100 (default 500) to increase again computational speed. We have checked that these simplifications were not impacting (at all) the accuracy. The model is generated in about a minute on 2 GHz intel cores (i3).</p>
+<p>In order to increase computation speed, we parallelise the computation accross four processors. We also pre-process the data via principal component analysis and retain only the first five components. We use an <strong>out-of-bag (OOB) resampling method for cross-validation</strong> and decrease the number of trees to 100 (default 500) to increase again computational speed. We have checked that these simplifications were not impacting (at all) the accuracy. The model is generated in about a minute on 2 GHz intel cores (i3).</p>
 <pre class="r"><code>cluster &lt;- makeCluster(4)
 registerDoParallel(cluster)
 fitControl &lt;- trainControl(preProcOptions = list(pcaComp = 5),
@@ -196,42 +196,45 @@ kable(cfmat$table,
 </tr>
 <tr class="even">
 <td>B</td>
-<td align="right">16</td>
-<td align="right">1499</td>
+<td align="right">6</td>
+<td align="right">1508</td>
 <td align="right">3</td>
-<td align="right">0</td>
+<td align="right">1</td>
 <td align="right">0</td>
 </tr>
 <tr class="odd">
 <td>C</td>
 <td align="right">0</td>
-<td align="right">10</td>
-<td align="right">1355</td>
-<td align="right">3</td>
+<td align="right">14</td>
+<td align="right">1345</td>
+<td align="right">9</td>
 <td align="right">0</td>
 </tr>
 <tr class="even">
 <td>D</td>
 <td align="right">0</td>
-<td align="right">2</td>
-<td align="right">12</td>
-<td align="right">1272</td>
+<td align="right">0</td>
+<td align="right">17</td>
+<td align="right">1269</td>
 <td align="right">0</td>
 </tr>
 <tr class="odd">
 <td>E</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">4</td>
-<td align="right">7</td>
-<td align="right">1431</td>
+<td align="right">1</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td align="right">8</td>
+<td align="right">1429</td>
 </tr>
 </tbody>
 </table>
 <pre class="r"><code>cfmat$overall[1]</code></pre>
-<pre><code>##  Accuracy 
-## 0.9926077</code></pre>
-<p>We thus have 99% accuracy, with sensitivity and specificity of the same order of magnitude. The out of sample OOB error rate is around 1%. Our prediction for the validation data set are then</p>
+<pre><code>## Accuracy 
+## 0.991843</code></pre>
+<p>We thus have 99% accuracy, with sensitivity and specificity of the same order of magnitude. The out of sample OOB <strong>error rate</strong> is thus</p>
+<pre class="r"><code>1 - cfmat$overall[[1]]</code></pre>
+<pre><code>## [1] 0.008157023</code></pre>
+<p>Our prediction for the validation data set are then</p>
 <pre class="r"><code>predict(mdl, valid)</code></pre>
 <pre><code>##  [1] B A B A A E D B A A B C B A E E A B B B
 ## Levels: A B C D E</code></pre>
